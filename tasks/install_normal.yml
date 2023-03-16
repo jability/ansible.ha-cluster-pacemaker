@@ -13,6 +13,7 @@
         - not (ansible_distribution in ['RedHat','AlmaLinux','Rocky'] and ansible_distribution_major_version == '9')
         - not (ansible_distribution == 'Fedora' and ansible_distribution_major_version >= '31')
         - not (ansible_distribution == 'Debian')
+        - not (ansible_distribution == 'Ubuntu')
 
     - name: "Packages: Add pcs-modules-2 Debian dependencies"
       set_fact:
@@ -50,11 +51,13 @@
   yum:
     name: "{{ packages_for_installation }}"
     state: 'installed'
-  when: ansible_distribution != 'Debian'
+  when:
+    - ansible_distribution != 'Debian'
+    - ansible_distribution != 'Ubuntu'
 
 - name: Install packages (APT)
   apt:
     name: "{{ packages_for_installation }}"
     state: 'present'
     cache_valid_time: 3600
-  when: ansible_distribution == 'Debian'
+  when: (ansible_distribution == 'Debian') or (ansible_distribution == 'Ubuntu')
